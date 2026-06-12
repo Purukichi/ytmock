@@ -95,9 +95,11 @@ function loadFile(file) {
   reader.onload = () => {
     videoImg.src = reader.result;
     thumbImg.src = reader.result;
+    tpImg.src = reader.result;
     setPan(videoImg, 50, 50);
-    setPan(thumbImg, 50, 50);
+    resetThumb();
     stage.classList.add("has-img");
+    document.body.classList.add("has-img");
   };
   reader.readAsDataURL(file);
 }
@@ -176,7 +178,110 @@ function enablePan(container, img) {
 }
 
 enablePan(videoBox, videoImg);
-enablePan(thumbBox, thumbImg);
+
+/* ---------------- thumbnail adjustment (zoom + pan, own panel) ---------------- */
+
+const tpImg = $("#tpImg");
+const tpPreview = $("#tpPreview");
+const thumbPanel = $("#thumbPanel");
+const zoomSlider = $("#zoomSlider");
+const thumbState = { x: 50, y: 50, zoom: 1 };
+
+/* The thumbnail image is laid out manually (size + offset) so it can
+   be zoomed beyond object-fit: cover, e.g. to close up on a face.
+   The same state drives both the sidebar thumbnail and the large
+   preview in the panel. */
+function renderThumb() {
+  if (!thumbImg.naturalWidth) return;
+  const nw = thumbImg.naturalWidth;
+  const nh = thumbImg.naturalHeight;
+  for (const [img, cont] of [[thumbImg, thumbBox], [tpImg, tpPreview]]) {
+    const cw = cont.clientWidth;
+    const ch = cont.clientHeight;
+    if (!cw) continue;
+    const s = Math.max(cw / nw, ch / nh) * thumbState.zoom;
+    const dw = nw * s;
+    const dh = nh * s;
+    img.style.width = dw + "px";
+    img.style.height = dh + "px";
+    img.style.left = (-(dw - cw) * thumbState.x) / 100 + "px";
+    img.style.top = (-(dh - ch) * thumbState.y) / 100 + "px";
+  }
+}
+thumbImg.addEventListener("load", renderThumb);
+
+function setThumbZoom(z, fromSlider) {
+  thumbState.zoom = Math.min(4, Math.max(1, z));
+  if (!fromSlider) zoomSlider.value = Math.round(thumbState.zoom * 100);
+  renderThumb();
+}
+function resetThumb() {
+  thumbState.x = 50;
+  thumbState.y = 50;
+  setThumbZoom(1);
+}
+
+zoomSlider.addEventListener("input", () => setThumbZoom(+zoomSlider.value / 100, true));
+$("#btnThumbReset").addEventListener("click", resetThumb);
+
+function thumbWheel(e) {
+  if (!stage.classList.contains("has-img")) return;
+  e.preventDefault();
+  setThumbZoom(thumbState.zoom * (e.deltaY < 0 ? 1.07 : 1 / 1.07));
+}
+tpPreview.addEventListener("wheel", thumbWheel, { passive: false });
+thumbBox.addEventListener("wheel", thumbWheel, { passive: false });
+
+function enableThumbPan(container, scaleFn) {
+  let drag = null;
+  container.addEventListener("pointerdown", (e) => {
+    if (!stage.classList.contains("has-img") || !thumbImg.naturalWidth) return;
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+    const s = Math.max(cw / thumbImg.naturalWidth, ch / thumbImg.naturalHeight) * thumbState.zoom;
+    drag = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      sx: thumbState.x,
+      sy: thumbState.y,
+      ox: thumbImg.naturalWidth * s - cw,
+      oy: thumbImg.naturalHeight * s - ch,
+    };
+    container.setPointerCapture(e.pointerId);
+    container.classList.add("panning");
+    e.preventDefault();
+  });
+  container.addEventListener("pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = (e.clientX - drag.x) / scaleFn();
+    const dy = (e.clientY - drag.y) / scaleFn();
+    if (drag.ox > 1) thumbState.x = clamp01(drag.sx - (dx / drag.ox) * 100);
+    if (drag.oy > 1) thumbState.y = clamp01(drag.sy - (dy / drag.oy) * 100);
+    renderThumb();
+  });
+  const end = (e) => {
+    if (drag && e.pointerId === drag.id) {
+      drag = null;
+      container.classList.remove("panning");
+    }
+  };
+  container.addEventListener("pointerup", end);
+  container.addEventListener("pointercancel", end);
+}
+
+enableThumbPan(thumbBox, () => stageScale);
+enableThumbPan(tpPreview, () => 1);
+
+$("#btnThumbPanel").addEventListener("click", () => {
+  const open = thumbPanel.hidden;
+  thumbPanel.hidden = !open;
+  $("#btnThumbPanel").setAttribute("aria-pressed", String(open));
+  if (open) renderThumb();
+});
+tpPreview.addEventListener("click", () => {
+  if (!stage.classList.contains("has-img")) $("#fileInput").click();
+});
 
 /* ---------------- toggles ---------------- */
 
@@ -275,7 +380,10 @@ function fitStage() {
   stageFrame.style.width = 1920 * stageScale + "px";
   stageFrame.style.height = 1080 * stageScale + "px";
 }
-addEventListener("resize", fitStage);
+addEventListener("resize", () => {
+  fitStage();
+  renderThumb();
+});
 
 /* ---------------- screenshot (JPG, 1920x1080) ---------------- */
 

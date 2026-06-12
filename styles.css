@@ -125,9 +125,9 @@ body {
 html[data-theme="dark"]  .ic-sun  { display: none; }
 html[data-theme="light"] .ic-moon { display: none; }
 
-/* aspect slider */
+/* sliders (aspect ratio, thumbnail zoom) */
 .slider-group { gap: 10px; }
-#arSlider {
+.rslider {
   -webkit-appearance: none;
   appearance: none;
   width: 170px;
@@ -137,7 +137,7 @@ html[data-theme="light"] .ic-moon { display: none; }
   outline: none;
   cursor: pointer;
 }
-#arSlider::-webkit-slider-thumb {
+.rslider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 15px;
   height: 15px;
@@ -145,7 +145,7 @@ html[data-theme="light"] .ic-moon { display: none; }
   background: var(--acc);
   border: none;
 }
-#arSlider::-moz-range-thumb {
+.rslider::-moz-range-thumb {
   width: 15px;
   height: 15px;
   border-radius: 50%;
@@ -166,6 +166,76 @@ html[data-theme="light"] .ic-moon { display: none; }
 @media (max-width: 900px) {
   .bar { flex-wrap: wrap; height: auto; padding: 8px 12px; row-gap: 4px; }
   #arSlider { width: 110px; }
+}
+
+/* ================= thumbnail adjustment panel ================= */
+/* anchored on the left so it never covers the sidebar thumbnail
+   it is adjusting */
+.thumb-panel {
+  position: fixed;
+  top: calc(var(--bar-h) + 10px);
+  left: 18px;
+  z-index: 50;
+  max-width: calc(100vw - 24px);
+  background: var(--c-panel);
+  border: 1px solid var(--c-line);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 12px 32px rgba(0,0,0,.35);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.thumb-panel[hidden] { display: none; }
+.tp-preview {
+  position: relative;
+  width: min(416px, 78vw);
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+.tp-preview img {
+  position: absolute;
+  display: none;
+}
+body.has-img .tp-preview img { display: block; }
+body.has-img .tp-preview { cursor: grab; }
+body.has-img .tp-preview.panning { cursor: grabbing; }
+.tp-ph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5a5a5a;
+}
+body.has-img .tp-ph { display: none; }
+.tp-ph svg {
+  width: 56px;
+  height: 56px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tp-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tp-row .rslider { flex: 1; width: auto; }
+.tp-ic {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--c-fg2);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* ================= stage scaling ================= */
@@ -654,7 +724,8 @@ html[data-theme="light"] .ic-moon { display: none; }
 }
 .yt-thumb.solid { background: none; }
 /* the recommended thumbnail is always 16:9 (like a real uploaded
-   thumbnail) and is adjusted independently of the player aspect */
+   thumbnail) and is adjusted independently of the player aspect;
+   its image is sized/positioned by JS to support zoom + pan */
 .yt-thumb-box {
   position: absolute;
   inset: 0;
@@ -663,11 +734,6 @@ html[data-theme="light"] .ic-moon { display: none; }
 }
 .yt-thumb-box img {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 50%;
   display: none;
 }
 .stage.has-img .yt-thumb-box img { display: block; }
