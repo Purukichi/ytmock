@@ -62,25 +62,29 @@ function setAr(ar, fromSlider) {
   layoutBoxes();
 }
 
-/* Size the video content box inside its container (player or thumbnail):
-   the box keeps the chosen aspect ratio, letterboxed like YouTube. */
-function fitBox(box, contW, contH) {
-  const contAr = contW / contH;
-  let w, h;
-  if (state.ar >= contAr) {
-    w = contW;
-    h = contW / state.ar;
-  } else {
-    h = contH;
-    w = contH * state.ar;
-  }
-  box.style.width = w + "px";
-  box.style.height = h + "px";
-}
-
+/* The player frame follows the aspect ratio like the real watch page:
+   wider than 16:9 shrinks the frame height (no letterbox bands),
+   taller than 16:9 keeps the 16:9 frame and pillarboxes the video.
+   In cinema mode the full-width band shrinks the same way, capped at
+   its maximum height. */
 function layoutBoxes() {
-  fitBox(videoBox, player.clientWidth, player.clientHeight);
-  fitBox(thumbBox, 168, 94);
+  player.style.height = "";
+  const w = player.clientWidth;
+  const maxH = state.cinema ? 870 : Math.round((w * 9) / 16);
+  const h = Math.min(maxH, Math.round(w / state.ar));
+  player.style.height = h + "px";
+
+  // video content box at the chosen ratio, centered in the frame
+  let bw, bh;
+  if (state.ar >= w / h) {
+    bw = w;
+    bh = w / state.ar;
+  } else {
+    bh = h;
+    bw = h * state.ar;
+  }
+  videoBox.style.width = bw + "px";
+  videoBox.style.height = bh + "px";
 }
 
 /* ---------------- image import ---------------- */
@@ -91,6 +95,8 @@ function loadFile(file) {
   reader.onload = () => {
     videoImg.src = reader.result;
     thumbImg.src = reader.result;
+    setPan(videoImg, 50, 50);
+    setPan(thumbImg, 50, 50);
     stage.classList.add("has-img");
   };
   reader.readAsDataURL(file);
@@ -114,6 +120,63 @@ document.addEventListener("paste", (e) => {
     }
   }
 });
+
+/* ---------------- image pan (drag to choose the visible area) ---------------- */
+
+function setPan(img, x, y) {
+  img.dataset.px = x;
+  img.dataset.py = y;
+  img.style.objectPosition = x + "% " + y + "%";
+}
+function clamp01(v) {
+  return Math.min(100, Math.max(0, v));
+}
+
+/* Dragging shifts object-position along the axis cropped by
+   object-fit: cover. Pointer deltas are divided by the current stage
+   scale so panning feels 1:1 at any window size. */
+function enablePan(container, img) {
+  let drag = null;
+  container.addEventListener("pointerdown", (e) => {
+    if (!stage.classList.contains("has-img") || !img.naturalWidth) return;
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+    const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+    drag = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      px: +img.dataset.px || 50,
+      py: +img.dataset.py || 50,
+      ox: img.naturalWidth * s - cw,
+      oy: img.naturalHeight * s - ch,
+    };
+    container.setPointerCapture(e.pointerId);
+    container.classList.add("panning");
+    e.preventDefault();
+  });
+  container.addEventListener("pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = (e.clientX - drag.x) / stageScale;
+    const dy = (e.clientY - drag.y) / stageScale;
+    let x = drag.px;
+    let y = drag.py;
+    if (drag.ox > 1) x = clamp01(drag.px - (dx / drag.ox) * 100);
+    if (drag.oy > 1) y = clamp01(drag.py - (dy / drag.oy) * 100);
+    setPan(img, x, y);
+  });
+  const end = (e) => {
+    if (drag && e.pointerId === drag.id) {
+      drag = null;
+      container.classList.remove("panning");
+    }
+  };
+  container.addEventListener("pointerup", end);
+  container.addEventListener("pointercancel", end);
+}
+
+enablePan(videoBox, videoImg);
+enablePan(thumbBox, thumbImg);
 
 /* ---------------- toggles ---------------- */
 
@@ -145,21 +208,28 @@ document.querySelectorAll(".pbtn").forEach((b) => {
 
 /* ---------------- title editing ---------------- */
 
+function singleLine(el) {
+  el.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      el.blur();
+    }
+  });
+}
 function syncTitle(from, to) {
   from.addEventListener("input", () => {
     to.textContent = from.textContent;
   });
-  from.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      from.blur();
-    }
-  });
+  singleLine(from);
 }
 recTitle.contentEditable = "true";
 recTitle.spellcheck = false;
 syncTitle(videoTitle, recTitle);
 syncTitle(recTitle, videoTitle);
+
+/* editable view / like counts (the pills auto-size to the content) */
+singleLine($("#viewCount"));
+singleLine($("#likeCount"));
 
 $("#btnEdit").addEventListener("click", () => {
   videoTitle.focus();
@@ -195,13 +265,15 @@ REC_COLORS.forEach((color, i) => {
 const stageOuter = $("#stageOuter");
 const stageFrame = $("#stageFrame");
 
+let stageScale = 1;
+
 function fitStage() {
   const availW = stageOuter.clientWidth - 30;
   const availH = stageOuter.clientHeight - 30;
-  const k = Math.max(0.05, Math.min(availW / 1920, availH / 1080));
-  stage.style.transform = "scale(" + k + ")";
-  stageFrame.style.width = 1920 * k + "px";
-  stageFrame.style.height = 1080 * k + "px";
+  stageScale = Math.max(0.05, Math.min(availW / 1920, availH / 1080));
+  stage.style.transform = "scale(" + stageScale + ")";
+  stageFrame.style.width = 1920 * stageScale + "px";
+  stageFrame.style.height = 1080 * stageScale + "px";
 }
 addEventListener("resize", fitStage);
 
