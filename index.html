@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ytmock</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='1' y='5' width='22' height='14' rx='4' fill='%23f03'/%3E%3Cpath d='M10 9l5 3-5 3z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ======================= CONTROL BAR ======================= -->
+<header class="bar" id="bar">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" class="brand-mark"><rect x="1" y="5" width="22" height="14" rx="4"/><path class="tri" d="M10 9l5 3-5 3z"/></svg>
+    <span class="brand-name">ytmock</span>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- image import -->
+  <button class="ibtn" id="btnImport" aria-label="Import image">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.7" cy="9.3" r="1.4"/><path d="M3.6 17.5l5.2-4.6 4 3.4 3.4-2.8 4.2 3.6"/></svg>
+  </button>
+  <input type="file" id="fileInput" accept="image/*" hidden>
+
+  <div class="sep"></div>
+
+  <!-- aspect ratio presets -->
+  <div class="group" id="presets" aria-label="Aspect ratio presets">
+    <button class="pbtn" data-ar="0.5625" aria-label="9:16"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="1.5"/></svg></button>
+    <button class="pbtn" data-ar="1" aria-label="1:1"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1.5"/></svg></button>
+    <button class="pbtn" data-ar="1.3333" aria-label="4:3"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/></svg></button>
+    <button class="pbtn" data-ar="1.7778" aria-label="16:9"><svg viewBox="0 0 24 24"><rect x="2.5" y="6.5" width="19" height="11" rx="1.5"/></svg></button>
+    <button class="pbtn" data-ar="2.35" aria-label="2.35:1"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="1.5"/></svg></button>
+  </div>
+
+  <!-- aspect ratio fine slider -->
+  <div class="group slider-group">
+    <input type="range" id="arSlider" min="0" max="1000" value="0" aria-label="Aspect ratio">
+    <output class="ar-label" id="arLabel">16:9</output>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- theme -->
+  <button class="ibtn" id="btnTheme" aria-label="Light / dark">
+    <svg viewBox="0 0 24 24" class="ic-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M18.7 5.3l-1.5 1.5M6.8 17.2l-1.5 1.5"/></svg>
+    <svg viewBox="0 0 24 24" class="ic-moon"><path d="M20.2 14.5A8.3 8.3 0 0 1 9.5 3.8a8.3 8.3 0 1 0 10.7 10.7z"/></svg>
+  </button>
+
+  <!-- cinema mode -->
+  <button class="ibtn toggle" id="btnCinema" aria-label="Cinema mode" aria-pressed="false">
+    <svg viewBox="0 0 24 24"><rect x="2" y="6.5" width="20" height="11" rx="1.5"/><path d="M6 17.5v-11M18 17.5v-11"/></svg>
+  </button>
+
+  <!-- seekbar visibility -->
+  <button class="ibtn toggle" id="btnSeek" aria-label="Seekbar on hover" aria-pressed="true">
+    <svg viewBox="0 0 24 24"><path d="M3 12h18"/><circle cx="14" cy="12" r="2.6" class="dot"/></svg>
+  </button>
+
+  <!-- edit title -->
+  <button class="ibtn" id="btnEdit" aria-label="Edit title">
+    <svg viewBox="0 0 24 24"><path d="M14.6 5.6l3.8 3.8M4 20l1.2-4.4L15.9 4.9a1.8 1.8 0 0 1 2.6 0l.6.6a1.8 1.8 0 0 1 0 2.6L8.4 18.8 4 20z"/></svg>
+  </button>
+
+  <div class="sep"></div>
+
+  <!-- screenshot -->
+  <button class="ibtn primary" id="btnShot" aria-label="Save screenshot (JPG 1920x1080)">
+    <svg viewBox="0 0 24 24"><path d="M8.2 6.5l1.4-2h4.8l1.4 2"/><rect x="3" y="6.5" width="18" height="13.5" rx="2.5"/><circle cx="12" cy="13" r="3.6"/></svg>
+  </button>
+</header>
+
+<!-- ======================= STAGE (1920x1080 virtual screen) ======================= -->
+<main class="stage-outer" id="stageOuter">
+  <div class="stage-frame" id="stageFrame">
+    <div class="stage dark seek" id="stage">
+
+      <!-- ===== masthead ===== -->
+      <div class="yt-masthead">
+        <div class="mh-start">
+          <div class="mh-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
+          <div class="yt-logo">
+            <svg viewBox="0 0 24 24" class="logo-mark"><rect x="1" y="5" width="22" height="14" rx="4"/><path class="tri" d="M10 9l5 3-5 3z"/></svg>
+            <span class="logo-text">YTMock</span>
+          </div>
+        </div>
+        <div class="mh-center">
+          <div class="yt-search">
+            <div class="yt-search-field"><span class="bar-line w40"></span></div>
+            <div class="yt-search-btn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></div>
+          </div>
+          <div class="yt-mic"><svg viewBox="0 0 24 24"><rect x="9.4" y="3.5" width="5.2" height="10" rx="2.6"/><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v3.5"/></svg></div>
+        </div>
+        <div class="mh-end">
+          <div class="mh-icon"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3M7.5 12h5M10 9.5v5" class="thin"/></svg></div>
+          <div class="mh-icon"><svg viewBox="0 0 24 24"><path d="M12 4a5.5 5.5 0 0 0-5.5 5.5c0 4-1.8 5.5-1.8 5.5h14.6s-1.8-1.5-1.8-5.5A5.5 5.5 0 0 0 12 4zM10 18.5a2 2 0 0 0 4 0"/></svg><span class="mh-badge">9+</span></div>
+          <div class="mh-avatar"></div>
+        </div>
+      </div>
+
+      <!-- ===== page ===== -->
+      <div class="yt-page">
+        <!-- cinema mode player slot -->
+        <div class="yt-cinema-slot" id="cinemaSlot"></div>
+
+        <div class="yt-columns">
+          <div class="yt-primary">
+            <div class="yt-player-slot" id="primarySlot">
+              <!-- player -->
+              <div class="yt-player" id="player">
+                <div class="yt-video-box" id="videoBox">
+                  <img id="videoImg" alt="" draggable="false">
+                  <div class="yt-placeholder" id="placeholder">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.7" cy="9.3" r="1.4"/><path d="M3.6 17.5l5.2-4.6 4 3.4 3.4-2.8 4.2 3.6"/></svg>
+                    <svg viewBox="0 0 24 24" class="arrow"><path d="M12 4v12M7 11l5 5 5-5"/></svg>
+                  </div>
+                </div>
+                <!-- hover controls -->
+                <div class="yt-controls">
+                  <div class="yt-grad"></div>
+                  <div class="yt-progress">
+                    <div class="yt-prog-buffer"></div>
+                    <div class="yt-prog-played"></div>
+                    <div class="yt-prog-knob"></div>
+                  </div>
+                  <div class="yt-ctrl-row">
+                    <div class="yt-ctrl-l">
+                      <svg viewBox="0 0 24 24" class="fill"><path d="M8 5v14l11-7z"/></svg>
+                      <svg viewBox="0 0 24 24" class="fill"><path d="M6 6v12l8.5-6zM16 6h2v12h-2z"/></svg>
+                      <svg viewBox="0 0 24 24" class="fill"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/></svg>
+                      <span class="yt-time">4:13&nbsp;/&nbsp;12:08</span>
+                    </div>
+                    <div class="yt-ctrl-r">
+                      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M6.5 12h5M6.5 15.5h8M14.5 12h3"/></svg>
+                      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.8v2.4M12 17.8v2.4M3.8 12h2.4M17.8 12h2.4M6.2 6.2l1.7 1.7M16.1 16.1l1.7 1.7M17.8 6.2l-1.7 1.7M7.9 16.1l-1.7 1.7"/></svg>
+                      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><rect x="12.5" y="11.5" width="6.5" height="5" rx="1" class="fillbox"/></svg>
+                      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M7 18V6M17 18V6"/></svg>
+                      <svg viewBox="0 0 24 24"><path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- title -->
+            <h1 class="yt-title" id="videoTitle" contenteditable="true" spellcheck="false">Sample Title</h1>
+
+            <!-- channel + actions -->
+            <div class="yt-meta-row">
+              <div class="yt-channel">
+                <div class="yt-ch-avatar"></div>
+                <div class="yt-ch-text">
+                  <span class="bar-line w90"></span>
+                  <span class="bar-line thin w60"></span>
+                </div>
+                <div class="yt-subscribe"><span class="bar-line inv w64"></span></div>
+              </div>
+              <div class="yt-actions">
+                <div class="yt-pill split">
+                  <svg viewBox="0 0 24 24"><path d="M7 10.5v9.5M7 11l4.2-6.4a1.9 1.9 0 0 1 3.4 1.4L14 10h4.6a1.9 1.9 0 0 1 1.8 2.4l-1.7 6.2A1.9 1.9 0 0 1 16.9 20H7M7 10.5H3.5V20H7"/></svg>
+                  <span class="yt-num">8.4K</span>
+                  <i class="vsep"></i>
+                  <svg viewBox="0 0 24 24" class="flip"><path d="M7 10.5v9.5M7 11l4.2-6.4a1.9 1.9 0 0 1 3.4 1.4L14 10h4.6a1.9 1.9 0 0 1 1.8 2.4l-1.7 6.2A1.9 1.9 0 0 1 16.9 20H7M7 10.5H3.5V20H7"/></svg>
+                </div>
+                <div class="yt-pill">
+                  <svg viewBox="0 0 24 24"><path d="M14 5l6 5.5-6 5.5v-3.5C8 12.5 5 14.5 3.5 18 4 12.5 8 9 14 8.5V5z"/></svg>
+                  <span class="bar-line w36"></span>
+                </div>
+                <div class="yt-pill">
+                  <svg viewBox="0 0 24 24"><path d="M12 4v10M7.5 10.5L12 15l4.5-4.5M5 19h14"/></svg>
+                  <span class="bar-line w52"></span>
+                </div>
+                <div class="yt-pill round">
+                  <svg viewBox="0 0 24 24" class="fill"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- description -->
+            <div class="yt-desc">
+              <div class="yt-desc-head"><span class="yt-num">123,456</span><span class="bar-line thin w70"></span><span class="bar-line thin w56"></span></div>
+              <span class="bar-line thin w95"></span>
+              <span class="bar-line thin w80"></span>
+              <span class="bar-line thin w40"></span>
+            </div>
+
+            <!-- comments -->
+            <div class="yt-comments">
+              <div class="yt-com-head"><span class="yt-num big">1,234</span><span class="bar-line w64"></span>
+                <svg viewBox="0 0 24 24" class="sort"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
+              </div>
+              <div class="yt-com">
+                <div class="yt-com-avatar a1"></div>
+                <div class="yt-com-body"><span class="bar-line thin w30"></span><span class="bar-line w85"></span><span class="bar-line w55"></span></div>
+              </div>
+              <div class="yt-com">
+                <div class="yt-com-avatar a2"></div>
+                <div class="yt-com-body"><span class="bar-line thin w24"></span><span class="bar-line w70"></span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== sidebar ===== -->
+          <div class="yt-secondary">
+            <div class="yt-chips">
+              <div class="yt-chip active"><span class="bar-line inv w28"></span></div>
+              <div class="yt-chip"><span class="bar-line w56"></span></div>
+              <div class="yt-chip"><span class="bar-line w40"></span></div>
+              <div class="yt-chip"><span class="bar-line w48"></span></div>
+              <div class="yt-chip"><span class="bar-line w32"></span></div>
+            </div>
+
+            <!-- first item: user's thumbnail -->
+            <div class="yt-rec user">
+              <div class="yt-thumb">
+                <div class="yt-thumb-box" id="thumbBox">
+                  <img id="thumbImg" alt="" draggable="false">
+                </div>
+                <span class="yt-dur">12:08</span>
+              </div>
+              <div class="yt-rec-info">
+                <div class="yt-rec-title" id="recTitle">Sample Title</div>
+                <span class="bar-line thin w60"></span>
+                <span class="bar-line thin w70"></span>
+              </div>
+            </div>
+
+            <div id="recList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- capture flash -->
+      <div class="flash" id="flash"></div>
+    </div>
+  </div>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
