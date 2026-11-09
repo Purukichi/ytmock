@@ -246,21 +246,6 @@ body[data-drop="thumb"] .thumb-panel { outline: 2px dashed var(--acc); outline-o
   position: absolute;
   display: none;
   max-width: none;
-  transform-origin: 50% 50%;
-}
-.tc-text {
-  position: absolute;
-  display: none;
-  transform: translate(-50%, -50%);
-  white-space: pre;
-  text-align: center;
-  line-height: 1.12;
-  letter-spacing: .01em;
-  paint-order: stroke fill;
-  -webkit-text-stroke-linejoin: round;
-  stroke-linejoin: round;
-  pointer-events: none;
-  user-select: none;
 }
 .tc-export {
   position: fixed;
@@ -282,9 +267,6 @@ body[data-drop="thumb"] .thumb-panel { outline: 2px dashed var(--acc); outline-o
 .tp-preview:focus-visible { box-shadow: 0 0 0 2px var(--acc); }
 body.has-thumb .tp-preview { cursor: grab; }
 body.has-thumb .tp-preview.panning { cursor: grabbing; }
-.tp-preview .tc-text { pointer-events: auto; cursor: move; }
-.tp-preview .tc-text:hover { outline: 1px dashed rgba(255,255,255,.7); outline-offset: 4px; }
-.tp-preview.moving-text .tc-text { outline: 1px dashed var(--acc); outline-offset: 4px; }
 /* the badge in the preview is shown at the size it has relative to
    the sidebar thumbnail (168px wide), i.e. the worst case */
 .tp-preview { container-type: inline-size; }
@@ -296,26 +278,6 @@ body.has-thumb .tp-preview.panning { cursor: grabbing; }
   border-radius: 2.4cqw;
   pointer-events: none;
 }
-.tp-grid, .tp-snap {
-  position: absolute;
-  pointer-events: none;
-  display: none;
-}
-.tp-grid {
-  inset: 0;
-  background:
-    linear-gradient(90deg, transparent calc(33.333% - .5px), rgba(255,255,255,.55) calc(33.333% - .5px), rgba(255,255,255,.55) calc(33.333% + .5px), transparent calc(33.333% + .5px),
-      transparent calc(66.666% - .5px), rgba(255,255,255,.55) calc(66.666% - .5px), rgba(255,255,255,.55) calc(66.666% + .5px), transparent calc(66.666% + .5px)),
-    linear-gradient(180deg, transparent calc(33.333% - .5px), rgba(255,255,255,.55) calc(33.333% - .5px), rgba(255,255,255,.55) calc(33.333% + .5px), transparent calc(33.333% + .5px),
-      transparent calc(66.666% - .5px), rgba(255,255,255,.55) calc(66.666% - .5px), rgba(255,255,255,.55) calc(66.666% + .5px), transparent calc(66.666% + .5px));
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
-}
-.tp-preview.grid .tp-grid { display: block; }
-.tp-snap { background: var(--acc); }
-.tp-snap.v { top: 0; bottom: 0; left: calc(50% - .5px); width: 1px; }
-.tp-snap.h { left: 0; right: 0; top: calc(50% - .5px); height: 1px; }
-.tp-preview.snap-v .tp-snap.v,
-.tp-preview.snap-h .tp-snap.h { display: block; }
 .tp-ph {
   position: absolute;
   inset: 0;
@@ -353,8 +315,6 @@ body.has-thumb .tp-ph { display: none; }
   align-items: center;
   gap: 8px;
 }
-.tp-row.end { justify-content: flex-end; }
-.tp-sec .tp-row { min-height: 28px; }
 .tp-row .rslider { flex: 1; width: auto; min-width: 60px; }
 .tp-ic {
   width: 20px;
@@ -368,49 +328,9 @@ body.has-thumb .tp-ph { display: none; }
   stroke-linejoin: round;
 }
 .tp-lbl { width: 72px; flex: none; color: var(--c-fg2); }
-.tp-val {
-  width: 30px;
-  text-align: right;
-  color: var(--c-fg2);
-  font-variant-numeric: tabular-nums;
-}
 .tp-note { color: var(--c-fg2); font-size: 11px; line-height: 1.4; }
 #zoomLabel { min-width: 48px; }
 
-.tp-sec {
-  border-top: 1px solid var(--c-line);
-  padding-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.tp-sec[open] { gap: 8px; }
-.tp-sec > summary {
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 13px;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  user-select: none;
-}
-.tp-sec > summary::-webkit-details-marker { display: none; }
-.tp-sec > summary::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-right: 1.6px solid currentColor;
-  border-bottom: 1.6px solid currentColor;
-  transform: rotate(-45deg);
-  transition: transform .15s;
-  margin: 0 3px;
-}
-.tp-sec[open] > summary::before { transform: rotate(45deg); }
-.tp-sec[open] > summary { margin-bottom: 2px; }
-
-.thumb-panel textarea,
-.thumb-panel select,
 .thumb-panel input[type="text"] {
   font: inherit;
   font-size: 13px;
@@ -418,53 +338,13 @@ body.has-thumb .tp-ph { display: none; }
   background: var(--c-bg);
   border: 1px solid var(--c-line);
   border-radius: 7px;
-  padding: 6px 8px;
+  padding: 0 8px;
+  width: 80px;
+  height: 28px;
   outline: none;
+  font-variant-numeric: tabular-nums;
 }
-.thumb-panel textarea { resize: vertical; min-height: 44px; width: 100%; }
-.thumb-panel select { height: 30px; padding: 0 6px; flex: 1; }
-.thumb-panel input[type="text"] { width: 80px; height: 28px; font-variant-numeric: tabular-nums; }
-.thumb-panel textarea:focus,
-.thumb-panel select:focus,
 .thumb-panel input[type="text"]:focus { border-color: var(--acc); }
-
-.swatch {
-  width: 28px;
-  height: 28px;
-  flex: none;
-  border-radius: 7px;
-  border: 1px solid var(--c-line);
-  overflow: hidden;
-  cursor: pointer;
-  position: relative;
-}
-.swatch input {
-  position: absolute;
-  inset: -6px;
-  width: calc(100% + 12px);
-  height: calc(100% + 12px);
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  background: none;
-}
-.chk { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
-.chk input { accent-color: var(--acc); margin: 0; }
-
-.seg { display: flex; border: 1px solid var(--c-line); border-radius: 7px; overflow: hidden; flex: none; }
-.seg button {
-  height: 28px;
-  min-width: 30px;
-  padding: 0 6px;
-  border: none;
-  background: none;
-  color: var(--c-fg);
-  font: inherit;
-  cursor: pointer;
-}
-.seg button + button { border-left: 1px solid var(--c-line); }
-.seg button:hover { background: var(--c-hover); }
-.seg button.active { background: color-mix(in srgb, var(--acc) 18%, transparent); color: var(--acc); }
 
 /* ================= stage scaling ================= */
 .stage-outer {
@@ -953,7 +833,7 @@ body.has-thumb .yt-thumb-box.panning { cursor: grabbing; }
 .yt-thumb.solid { background: none; }
 /* the recommended thumbnail is always 16:9 (like a real uploaded
    thumbnail) and is edited independently of the player aspect;
-   it is a ".tc" composition rendered by JS (zoom, pan, text...) */
+   it is a ".tc" composition rendered by JS (zoom, pan) */
 .yt-thumb-box {
   position: absolute;
   inset: 0;

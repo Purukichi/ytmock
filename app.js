@@ -217,22 +217,14 @@ videoBox.addEventListener("dblclick", () => setPan(videoImg, 50, 50));
 
 /* ---------------- thumbnail editor ---------------- */
 
-/* The thumbnail is a small composition (image + optional text layer)
-   designed on a 1280x720 canvas — the size of a real uploaded
-   thumbnail. Every place that shows it (sidebar, panel preview,
-   real-size previews, export) is a ".tc" container rendered from the
-   same state, scaled by container width / 1280. */
+/* The thumbnail is framed on a 1280x720 canvas — the size of a real
+   uploaded thumbnail. Every place that shows it (sidebar, panel
+   preview, real-size previews, export) is a ".tc" container rendered
+   from the same state. */
 
 const TW = 1280;
 const TH = 720;
 const ZOOM_MAX = 5;
-
-const FONTS = {
-  gothic: ['"Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, "Arial Black", sans-serif', 900],
-  round: ['"Hiragino Maru Gothic ProN", "M PLUS Rounded 1c", "Arial Rounded MT Bold", "Yu Gothic", Meiryo, sans-serif', 800],
-  mincho: ['"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", "Times New Roman", serif', 800],
-  impact: ['Impact, Haettenschweiler, "Arial Narrow Bold", "Arial Black", sans-serif', 400],
-};
 
 const thumbPanel = $("#thumbPanel");
 const tpPreview = $("#tpPreview");
@@ -247,21 +239,6 @@ const thumb = {
   x: 50,
   y: 50,
   zoom: 1,
-  flip: false,
-  bri: 100,
-  con: 100,
-  sat: 100,
-  text: "",
-  font: "gothic",
-  size: 130,
-  color: "#ffffff",
-  stroke: "#000000",
-  strokeW: 12,
-  shadow: true,
-  band: false,
-  bandColor: "#e8243c",
-  tx: 50,
-  ty: 84,
 };
 
 /* ----- containers ----- */
@@ -277,7 +254,7 @@ for (const [w, label] of SIZES) {
   const fig = document.createElement("figure");
   fig.innerHTML =
     '<div class="tc tp-mini" style="width:' + w + "px;height:" + Math.round((w * 9) / 16) + 'px">' +
-    '<img class="tc-img" alt="" draggable="false"><div class="tc-text"></div>' +
+    '<img class="tc-img" alt="" draggable="false">' +
     '<span class="yt-dur">12:08</span></div>' +
     "<figcaption>" + label + " " + w + "px</figcaption>";
   tpSizes.appendChild(fig);
@@ -287,7 +264,7 @@ for (const [w, label] of SIZES) {
 // off-screen 1280x720 composition used for export
 const thumbExport = document.createElement("div");
 thumbExport.className = "tc tc-export";
-thumbExport.innerHTML = '<img class="tc-img" alt=""><div class="tc-text"></div>';
+thumbExport.innerHTML = '<img class="tc-img" alt="">';
 document.body.appendChild(thumbExport);
 
 /* ----- rendering ----- */
@@ -298,8 +275,6 @@ function coverScale(cw, ch) {
 
 function renderInto(cont, cw, ch) {
   const img = cont.querySelector(".tc-img");
-  const txt = cont.querySelector(".tc-text");
-  const k = cw / TW;
 
   if (thumb.src && thumb.nw) {
     if (img.getAttribute("src") !== thumb.src) img.src = thumb.src;
@@ -311,36 +286,8 @@ function renderInto(cont, cw, ch) {
     img.style.height = dh + "px";
     img.style.left = (-(dw - cw) * thumb.x) / 100 + "px";
     img.style.top = (-(dh - ch) * thumb.y) / 100 + "px";
-    img.style.transform = thumb.flip ? "scaleX(-1)" : "none";
-    const f = [];
-    if (thumb.bri !== 100) f.push("brightness(" + thumb.bri + "%)");
-    if (thumb.con !== 100) f.push("contrast(" + thumb.con + "%)");
-    if (thumb.sat !== 100) f.push("saturate(" + thumb.sat + "%)");
-    img.style.filter = f.join(" ") || "none";
   } else {
     img.style.display = "none";
-  }
-
-  if (thumb.text.trim()) {
-    const [family, weight] = FONTS[thumb.font];
-    txt.textContent = thumb.text;
-    txt.style.display = "block";
-    txt.style.left = thumb.tx + "%";
-    txt.style.top = thumb.ty + "%";
-    txt.style.fontFamily = family;
-    txt.style.fontWeight = weight;
-    txt.style.fontSize = thumb.size * k + "px";
-    txt.style.color = thumb.color;
-    // stroke is drawn centered on the glyph edge; paint-order puts it
-    // behind the fill so the visible outline width is strokeW
-    txt.style.webkitTextStroke = thumb.strokeW ? thumb.strokeW * 2 * k + "px " + thumb.stroke : "0";
-    txt.style.textShadow = thumb.shadow
-      ? Math.max(1, 6 * k) + "px " + Math.max(1, 6 * k) + "px " + 14 * k + "px rgba(0,0,0,.55)"
-      : "none";
-    txt.style.background = thumb.band ? thumb.bandColor : "transparent";
-    txt.style.padding = thumb.band ? 0.08 * thumb.size * k + "px " + 0.4 * thumb.size * k + "px" : "0";
-  } else {
-    txt.style.display = "none";
   }
 }
 
@@ -390,7 +337,7 @@ $("#btnThumbLink").addEventListener("click", () => {
   if (videoSrc) setThumbSource(videoSrc, false);
 });
 
-/* ----- zoom / pan / flip ----- */
+/* ----- zoom / pan ----- */
 
 function setThumbZoom(z) {
   thumb.zoom = Math.min(ZOOM_MAX, Math.max(1, z));
@@ -443,16 +390,6 @@ zoomSlider.addEventListener("input", () => {
 });
 $("#btnThumbReset").addEventListener("click", resetThumb);
 
-$("#btnThumbFlip").addEventListener("click", (e) => {
-  thumb.flip = !thumb.flip;
-  e.currentTarget.setAttribute("aria-pressed", String(thumb.flip));
-  queueRender();
-});
-$("#btnThumbGrid").addEventListener("click", (e) => {
-  const on = tpPreview.classList.toggle("grid");
-  e.currentTarget.setAttribute("aria-pressed", String(on));
-});
-
 /* local pointer position in container px (works inside the scaled stage) */
 function localPoint(cont, e) {
   const r = cont.getBoundingClientRect();
@@ -468,34 +405,27 @@ function thumbWheel(e) {
   zoomAt(this, thumb.zoom * step, mx, my);
 }
 
-const SNAP = 1.6; // % distance at which text snaps to the center lines
-
-function enableThumbDrag(cont, textDraggable) {
+function enableThumbDrag(cont) {
   let drag = null;
   cont.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
     const [, , k] = localPoint(cont, e);
     const cw = cont.clientWidth;
     const ch = cont.clientHeight;
-    if (textDraggable && e.target.classList.contains("tc-text")) {
-      drag = { mode: "text", id: e.pointerId, x: e.clientX, y: e.clientY, k, cw, ch, sx: thumb.tx, sy: thumb.ty };
-    } else {
-      if (!thumb.nw) return;
-      const s = coverScale(cw, ch);
-      drag = {
-        mode: "pan",
-        id: e.pointerId,
-        x: e.clientX,
-        y: e.clientY,
-        k,
-        sx: thumb.x,
-        sy: thumb.y,
-        ox: thumb.nw * s - cw,
-        oy: thumb.nh * s - ch,
-      };
-    }
+    if (!thumb.nw) return;
+    const s = coverScale(cw, ch);
+    drag = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      k,
+      sx: thumb.x,
+      sy: thumb.y,
+      ox: thumb.nw * s - cw,
+      oy: thumb.nh * s - ch,
+    };
     cont.setPointerCapture(e.pointerId);
-    cont.classList.add(drag.mode === "text" ? "moving-text" : "panning");
+    cont.classList.add("panning");
     e.preventDefault();
     cont.focus({ preventScroll: true });
   });
@@ -503,47 +433,31 @@ function enableThumbDrag(cont, textDraggable) {
     if (!drag || e.pointerId !== drag.id) return;
     const dx = (e.clientX - drag.x) / drag.k;
     const dy = (e.clientY - drag.y) / drag.k;
-    if (drag.mode === "text") {
-      let tx = Math.min(100, Math.max(0, drag.sx + (dx / drag.cw) * 100));
-      let ty = Math.min(100, Math.max(0, drag.sy + (dy / drag.ch) * 100));
-      const snapX = !e.altKey && Math.abs(tx - 50) < SNAP;
-      const snapY = !e.altKey && Math.abs(ty - 50) < SNAP;
-      if (snapX) tx = 50;
-      if (snapY) ty = 50;
-      cont.classList.toggle("snap-v", snapX);
-      cont.classList.toggle("snap-h", snapY);
-      thumb.tx = tx;
-      thumb.ty = ty;
-      updatePosSeg();
-    } else {
-      if (drag.ox > 1) thumb.x = clamp01(drag.sx - (dx / drag.ox) * 100);
-      if (drag.oy > 1) thumb.y = clamp01(drag.sy - (dy / drag.oy) * 100);
-    }
+    if (drag.ox > 1) thumb.x = clamp01(drag.sx - (dx / drag.ox) * 100);
+    if (drag.oy > 1) thumb.y = clamp01(drag.sy - (dy / drag.oy) * 100);
     queueRender();
   });
   const end = (e) => {
     if (drag && e.pointerId === drag.id) {
       drag = null;
-      cont.classList.remove("panning", "moving-text", "snap-v", "snap-h");
+      cont.classList.remove("panning");
     }
   };
   cont.addEventListener("pointerup", end);
   cont.addEventListener("pointercancel", end);
   cont.addEventListener("wheel", thumbWheel, { passive: false });
-  cont.addEventListener("dblclick", (e) => {
-    if (!e.target.classList.contains("tc-text")) resetThumb();
-  });
+  cont.addEventListener("dblclick", resetThumb);
 }
 
-enableThumbDrag(thumbBox, false);
-enableThumbDrag(tpPreview, true);
+enableThumbDrag(thumbBox);
+enableThumbDrag(tpPreview);
 
 tpPreview.addEventListener("click", () => {
   if (!thumb.src) $("#thumbFileInput").click();
 });
 
 /* keyboard on the focused preview: arrows pan (Shift = larger step),
-   +/- zoom, 0 reset, F flip */
+   +/- zoom, 0 reset */
 tpPreview.addEventListener("keydown", (e) => {
   const step = e.shiftKey ? 0.1 : 0.02;
   const map = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
@@ -553,83 +467,8 @@ tpPreview.addEventListener("keydown", (e) => {
   else if (e.key === "+" || e.key === "=") zoomAt(tpPreview, thumb.zoom * 1.1, cw / 2, ch / 2);
   else if (e.key === "-") zoomAt(tpPreview, thumb.zoom / 1.1, cw / 2, ch / 2);
   else if (e.key === "0") resetThumb();
-  else if (e.key === "f" || e.key === "F") $("#btnThumbFlip").click();
   else return;
   e.preventDefault();
-});
-
-/* ----- text layer ----- */
-
-function bindInput(id, key, conv = (v) => v, ev = "input") {
-  const el = $(id);
-  el.addEventListener(ev, () => {
-    thumb[key] = conv(el.type === "checkbox" ? el.checked : el.value);
-    queueRender();
-  });
-}
-bindInput("#ttText", "text");
-bindInput("#ttFont", "font", String, "change");
-bindInput("#ttColor", "color");
-bindInput("#ttStroke", "stroke");
-bindInput("#ttStrokeW", "strokeW", Number);
-bindInput("#ttShadow", "shadow", Boolean, "change");
-bindInput("#ttBand", "band", Boolean, "change");
-bindInput("#ttBandColor", "bandColor");
-$("#ttSize").addEventListener("input", (e) => {
-  thumb.size = +e.target.value;
-  $("#ttSizeVal").value = thumb.size;
-  queueRender();
-});
-// picking a band color implies turning the band on
-$("#ttBandColor").addEventListener("input", () => {
-  if (!thumb.band) {
-    thumb.band = $("#ttBand").checked = true;
-    queueRender();
-  }
-});
-
-function updatePosSeg() {
-  document.querySelectorAll("#ttPos button").forEach((b) => {
-    b.classList.toggle("active", thumb.tx === 50 && Math.abs(thumb.ty - +b.dataset.ty) < 0.5);
-  });
-}
-document.querySelectorAll("#ttPos button").forEach((b) => {
-  b.addEventListener("click", () => {
-    thumb.tx = 50;
-    thumb.ty = +b.dataset.ty;
-    updatePosSeg();
-    queueRender();
-  });
-});
-updatePosSeg();
-
-/* ----- color adjustments ----- */
-
-const ADJ = { adjBri: "bri", adjCon: "con", adjSat: "sat" };
-function syncAdj() {
-  for (const [id, key] of Object.entries(ADJ)) {
-    $("#" + id).value = thumb[key];
-    document.querySelector('output[for="' + id + '"]').value = thumb[key];
-  }
-}
-for (const [id, key] of Object.entries(ADJ)) {
-  const el = $("#" + id);
-  el.addEventListener("input", () => {
-    thumb[key] = +el.value;
-    document.querySelector('output[for="' + id + '"]').value = el.value;
-    queueRender();
-  });
-  // double-click a slider to reset it
-  el.addEventListener("dblclick", () => {
-    thumb[key] = 100;
-    syncAdj();
-    queueRender();
-  });
-}
-$("#btnAdjReset").addEventListener("click", () => {
-  thumb.bri = thumb.con = thumb.sat = 100;
-  syncAdj();
-  queueRender();
 });
 
 /* ----- duration badge ----- */
@@ -645,7 +484,7 @@ $("#durInput").addEventListener("input", (e) => {
 /* ----- export (1280x720 JPG) ----- */
 
 $("#btnThumbSave").addEventListener("click", async () => {
-  if (!thumb.src && !thumb.text.trim()) return;
+  if (!thumb.src) return;
   renderInto(thumbExport, TW, TH);
   const img = thumbExport.querySelector(".tc-img");
   if (thumb.src) await img.decode().catch(() => {});

@@ -103,10 +103,6 @@
 
   <div class="tp-preview tc" id="tpPreview" tabindex="0" title="ドラッグ: 位置 / ホイール: ズーム / ダブルクリック: リセット">
     <img class="tc-img" alt="" draggable="false">
-    <div class="tc-text"></div>
-    <div class="tp-grid"></div>
-    <div class="tp-snap v"></div>
-    <div class="tp-snap h"></div>
     <span class="yt-dur tp-dur">12:08</span>
     <div class="tp-ph">
       <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.7" cy="9.3" r="1.4"/><path d="M3.6 17.5l5.2-4.6 4 3.4 3.4-2.8 4.2 3.6"/></svg>
@@ -118,12 +114,6 @@
     <input type="range" id="zoomSlider" class="rslider" min="100" max="500" value="100" aria-label="Thumbnail zoom">
     <svg class="tp-ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M8.2 11h5.6M11 8.2v5.6"/></svg>
     <output class="ar-label" id="zoomLabel">100%</output>
-    <button class="ibtn sm toggle" id="btnThumbFlip" aria-pressed="false" title="左右反転">
-      <svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M9 7L3.5 17H9z"/><path d="M15 7l5.5 10H15z"/></svg>
-    </button>
-    <button class="ibtn sm toggle" id="btnThumbGrid" aria-pressed="false" title="ガイド（三分割線）">
-      <svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/><path d="M9.2 5.5v13M14.8 5.5v13M3.5 9.8h17M3.5 14.2h17"/></svg>
-    </button>
     <button class="ibtn sm" id="btnThumbReset" title="位置・ズームをリセット">
       <svg viewBox="0 0 24 24"><path d="M4.5 5.5V10H9"/><path d="M5.3 14.8a7.3 7.3 0 1 0 .3-6.4L4.5 10"/></svg>
     </button>
@@ -132,43 +122,10 @@
   <!-- real-size previews (CSS px at the 1920 layout) -->
   <div class="tp-sizes" id="tpSizes"></div>
 
-  <details class="tp-sec" open>
-    <summary>テキスト</summary>
-    <textarea id="ttText" rows="2" spellcheck="false" placeholder="サムネに文字を入れる（改行可）"></textarea>
-    <div class="tp-row">
-      <select id="ttFont" aria-label="Font">
-        <option value="gothic">ゴシック極太</option>
-        <option value="round">丸ゴシック</option>
-        <option value="mincho">明朝</option>
-        <option value="impact">Impact</option>
-      </select>
-      <label class="swatch" title="文字色"><input type="color" id="ttColor" value="#ffffff"></label>
-      <div class="seg" id="ttPos" title="配置">
-        <button data-ty="16">上</button><button data-ty="50">中</button><button data-ty="84">下</button>
-      </div>
-    </div>
-    <div class="tp-row"><span class="tp-lbl">サイズ</span><input type="range" id="ttSize" class="rslider" min="30" max="320" value="130"><output class="tp-val" id="ttSizeVal">130</output></div>
-    <div class="tp-row"><span class="tp-lbl">縁取り</span><input type="range" id="ttStrokeW" class="rslider" min="0" max="40" value="12"><label class="swatch" title="縁の色"><input type="color" id="ttStroke" value="#000000"></label></div>
-    <div class="tp-row">
-      <label class="chk"><input type="checkbox" id="ttShadow" checked> 影</label>
-      <label class="chk"><input type="checkbox" id="ttBand"> 帯</label>
-      <label class="swatch" title="帯の色"><input type="color" id="ttBandColor" value="#e8243c"></label>
-      <span class="tp-note">文字はプレビュー上でドラッグして移動</span>
-    </div>
-  </details>
-
-  <details class="tp-sec">
-    <summary>色調整</summary>
-    <div class="tp-row"><span class="tp-lbl">明るさ</span><input type="range" class="rslider adj" id="adjBri" min="50" max="150" value="100"><output class="tp-val" for="adjBri">100</output></div>
-    <div class="tp-row"><span class="tp-lbl">コントラスト</span><input type="range" class="rslider adj" id="adjCon" min="50" max="150" value="100"><output class="tp-val" for="adjCon">100</output></div>
-    <div class="tp-row"><span class="tp-lbl">彩度</span><input type="range" class="rslider adj" id="adjSat" min="0" max="200" value="100"><output class="tp-val" for="adjSat">100</output></div>
-    <div class="tp-row end"><button class="tbtn" id="btnAdjReset">色調整をリセット</button></div>
-  </details>
-
   <div class="tp-row">
     <span class="tp-lbl">再生時間</span>
     <input type="text" id="durInput" value="12:08" maxlength="9" spellcheck="false" aria-label="Duration">
-    <span class="tp-note">ドラッグ: 位置 / ホイール: カーソル位置にズーム / 矢印キー: 微調整</span>
+    <span class="tp-note">ドラッグ: 位置 / ホイール: カーソル位置にズーム / 矢印キー: 微調整 / ダブルクリック: リセット</span>
   </div>
 </aside>
 
@@ -317,7 +274,6 @@
               <div class="yt-thumb">
                 <div class="yt-thumb-box tc" id="thumbBox">
                   <img class="tc-img" alt="" draggable="false">
-                  <div class="tc-text"></div>
                 </div>
                 <span class="yt-dur" id="thumbDur">12:08</span>
               </div>
