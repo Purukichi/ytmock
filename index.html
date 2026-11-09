@@ -19,7 +19,7 @@
   <div class="sep"></div>
 
   <!-- image import -->
-  <button class="ibtn" id="btnImport" aria-label="Import image">
+  <button class="ibtn" id="btnImport" aria-label="Import image" title="画像を読み込む（ドラッグ&ドロップ / 貼り付けも可）">
     <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.7" cy="9.3" r="1.4"/><path d="M3.6 17.5l5.2-4.6 4 3.4 3.4-2.8 4.2 3.6"/></svg>
   </button>
   <input type="file" id="fileInput" accept="image/*" hidden>
@@ -28,11 +28,11 @@
 
   <!-- aspect ratio presets -->
   <div class="group" id="presets" aria-label="Aspect ratio presets">
-    <button class="pbtn" data-ar="0.5625" aria-label="9:16"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="1.5"/></svg></button>
-    <button class="pbtn" data-ar="1" aria-label="1:1"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1.5"/></svg></button>
-    <button class="pbtn" data-ar="1.3333" aria-label="4:3"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/></svg></button>
-    <button class="pbtn" data-ar="1.7778" aria-label="16:9"><svg viewBox="0 0 24 24"><rect x="2.5" y="6.5" width="19" height="11" rx="1.5"/></svg></button>
-    <button class="pbtn" data-ar="2.35" aria-label="2.35:1"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="1.5"/></svg></button>
+    <button class="pbtn" data-ar="0.5625" aria-label="9:16" title="9:16"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="1.5"/></svg></button>
+    <button class="pbtn" data-ar="1" aria-label="1:1" title="1:1"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1.5"/></svg></button>
+    <button class="pbtn" data-ar="1.3333" aria-label="4:3" title="4:3"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/></svg></button>
+    <button class="pbtn" data-ar="1.7778" aria-label="16:9" title="16:9"><svg viewBox="0 0 24 24"><rect x="2.5" y="6.5" width="19" height="11" rx="1.5"/></svg></button>
+    <button class="pbtn" data-ar="2.35" aria-label="2.35:1" title="2.35:1"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="1.5"/></svg></button>
   </div>
 
   <!-- aspect ratio fine slider -->
@@ -44,54 +44,131 @@
   <div class="sep"></div>
 
   <!-- theme -->
-  <button class="ibtn" id="btnTheme" aria-label="Light / dark">
+  <button class="ibtn" id="btnTheme" aria-label="Light / dark" title="ライト / ダーク">
     <svg viewBox="0 0 24 24" class="ic-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M18.7 5.3l-1.5 1.5M6.8 17.2l-1.5 1.5"/></svg>
     <svg viewBox="0 0 24 24" class="ic-moon"><path d="M20.2 14.5A8.3 8.3 0 0 1 9.5 3.8a8.3 8.3 0 1 0 10.7 10.7z"/></svg>
   </button>
 
   <!-- cinema mode -->
-  <button class="ibtn toggle" id="btnCinema" aria-label="Cinema mode" aria-pressed="false">
+  <button class="ibtn toggle" id="btnCinema" aria-label="Cinema mode" aria-pressed="false" title="シネマモード">
     <svg viewBox="0 0 24 24"><rect x="2" y="6.5" width="20" height="11" rx="1.5"/><path d="M6 17.5v-11M18 17.5v-11"/></svg>
   </button>
 
   <!-- seekbar visibility -->
-  <button class="ibtn toggle" id="btnSeek" aria-label="Seekbar on hover" aria-pressed="true">
+  <button class="ibtn toggle" id="btnSeek" aria-label="Seekbar on hover" aria-pressed="true" title="シークバー表示">
     <svg viewBox="0 0 24 24"><path d="M3 12h18"/><circle cx="14" cy="12" r="2.6" class="dot"/></svg>
   </button>
 
   <!-- thumbnail adjustment panel -->
-  <button class="ibtn toggle" id="btnThumbPanel" aria-label="Adjust thumbnail" aria-pressed="false">
+  <button class="ibtn toggle" id="btnThumbPanel" aria-label="Adjust thumbnail" aria-pressed="false" title="サムネイル編集 (T)">
     <svg viewBox="0 0 24 24"><rect x="2.5" y="7.5" width="11.5" height="9" rx="1.5"/><path d="M17 10h4.5M17 13.5h3"/></svg>
   </button>
 
   <!-- edit title -->
-  <button class="ibtn" id="btnEdit" aria-label="Edit title">
+  <button class="ibtn" id="btnEdit" aria-label="Edit title" title="タイトルを編集">
     <svg viewBox="0 0 24 24"><path d="M14.6 5.6l3.8 3.8M4 20l1.2-4.4L15.9 4.9a1.8 1.8 0 0 1 2.6 0l.6.6a1.8 1.8 0 0 1 0 2.6L8.4 18.8 4 20z"/></svg>
   </button>
 
   <div class="sep"></div>
 
   <!-- screenshot -->
-  <button class="ibtn primary" id="btnShot" aria-label="Save screenshot (JPG 1920x1080)">
+  <button class="ibtn primary" id="btnShot" aria-label="Save screenshot (JPG 1920x1080)" title="スクリーンショット保存 JPG 1920×1080">
     <svg viewBox="0 0 24 24"><path d="M8.2 6.5l1.4-2h4.8l1.4 2"/><rect x="3" y="6.5" width="18" height="13.5" rx="2.5"/><circle cx="12" cy="13" r="3.6"/></svg>
   </button>
 </header>
 
-<!-- ======================= THUMBNAIL ADJUSTMENT PANEL ======================= -->
-<aside class="thumb-panel" id="thumbPanel" hidden>
-  <div class="tp-preview" id="tpPreview">
-    <img id="tpImg" alt="" draggable="false">
+<!-- ======================= THUMBNAIL EDITOR PANEL ======================= -->
+<aside class="thumb-panel" id="thumbPanel" hidden aria-label="Thumbnail editor">
+  <div class="tp-head">
+    <span class="tp-title">サムネイル</span>
+    <div class="tp-head-btns">
+      <button class="tbtn" id="btnThumbImport" title="サムネ専用の画像を読み込む（パネルへのドロップも可）">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.7" cy="9.3" r="1.4"/><path d="M3.6 17.5l5.2-4.6 4 3.4 3.4-2.8 4.2 3.6"/></svg>
+        <span>差し替え</span>
+      </button>
+      <button class="tbtn" id="btnThumbLink" title="動画と同じ画像に戻す" disabled>
+        <svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
+        <span>動画と同じ</span>
+      </button>
+      <button class="tbtn accent" id="btnThumbSave" title="サムネを 1280×720 JPG で保存">
+        <svg viewBox="0 0 24 24"><path d="M12 4v10M7.5 10.5L12 15l4.5-4.5M5 19h14"/></svg>
+        <span>保存</span>
+      </button>
+      <button class="ibtn sm" id="btnThumbClose" title="閉じる (Esc)" aria-label="Close">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+  <input type="file" id="thumbFileInput" accept="image/*" hidden>
+
+  <div class="tp-preview tc" id="tpPreview" tabindex="0" title="ドラッグ: 位置 / ホイール: ズーム / ダブルクリック: リセット">
+    <img class="tc-img" alt="" draggable="false">
+    <div class="tc-text"></div>
+    <div class="tp-grid"></div>
+    <div class="tp-snap v"></div>
+    <div class="tp-snap h"></div>
+    <span class="yt-dur tp-dur">12:08</span>
     <div class="tp-ph">
       <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.7" cy="9.3" r="1.4"/><path d="M3.6 17.5l5.2-4.6 4 3.4 3.4-2.8 4.2 3.6"/></svg>
     </div>
   </div>
+
   <div class="tp-row">
     <svg class="tp-ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M8.2 11h5.6"/></svg>
-    <input type="range" id="zoomSlider" class="rslider" min="100" max="400" value="100" aria-label="Thumbnail zoom">
+    <input type="range" id="zoomSlider" class="rslider" min="100" max="500" value="100" aria-label="Thumbnail zoom">
     <svg class="tp-ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M8.2 11h5.6M11 8.2v5.6"/></svg>
-    <button class="ibtn" id="btnThumbReset" aria-label="Reset thumbnail">
+    <output class="ar-label" id="zoomLabel">100%</output>
+    <button class="ibtn sm toggle" id="btnThumbFlip" aria-pressed="false" title="左右反転">
+      <svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M9 7L3.5 17H9z"/><path d="M15 7l5.5 10H15z"/></svg>
+    </button>
+    <button class="ibtn sm toggle" id="btnThumbGrid" aria-pressed="false" title="ガイド（三分割線）">
+      <svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/><path d="M9.2 5.5v13M14.8 5.5v13M3.5 9.8h17M3.5 14.2h17"/></svg>
+    </button>
+    <button class="ibtn sm" id="btnThumbReset" title="位置・ズームをリセット">
       <svg viewBox="0 0 24 24"><path d="M4.5 5.5V10H9"/><path d="M5.3 14.8a7.3 7.3 0 1 0 .3-6.4L4.5 10"/></svg>
     </button>
+  </div>
+
+  <!-- real-size previews (CSS px at the 1920 layout) -->
+  <div class="tp-sizes" id="tpSizes"></div>
+
+  <details class="tp-sec" open>
+    <summary>テキスト</summary>
+    <textarea id="ttText" rows="2" spellcheck="false" placeholder="サムネに文字を入れる（改行可）"></textarea>
+    <div class="tp-row">
+      <select id="ttFont" aria-label="Font">
+        <option value="gothic">ゴシック極太</option>
+        <option value="round">丸ゴシック</option>
+        <option value="mincho">明朝</option>
+        <option value="impact">Impact</option>
+      </select>
+      <label class="swatch" title="文字色"><input type="color" id="ttColor" value="#ffffff"></label>
+      <div class="seg" id="ttPos" title="配置">
+        <button data-ty="16">上</button><button data-ty="50">中</button><button data-ty="84">下</button>
+      </div>
+    </div>
+    <div class="tp-row"><span class="tp-lbl">サイズ</span><input type="range" id="ttSize" class="rslider" min="30" max="320" value="130"><output class="tp-val" id="ttSizeVal">130</output></div>
+    <div class="tp-row"><span class="tp-lbl">縁取り</span><input type="range" id="ttStrokeW" class="rslider" min="0" max="40" value="12"><label class="swatch" title="縁の色"><input type="color" id="ttStroke" value="#000000"></label></div>
+    <div class="tp-row">
+      <label class="chk"><input type="checkbox" id="ttShadow" checked> 影</label>
+      <label class="chk"><input type="checkbox" id="ttBand"> 帯</label>
+      <label class="swatch" title="帯の色"><input type="color" id="ttBandColor" value="#e8243c"></label>
+      <span class="tp-note">文字はプレビュー上でドラッグして移動</span>
+    </div>
+  </details>
+
+  <details class="tp-sec">
+    <summary>色調整</summary>
+    <div class="tp-row"><span class="tp-lbl">明るさ</span><input type="range" class="rslider adj" id="adjBri" min="50" max="150" value="100"><output class="tp-val" for="adjBri">100</output></div>
+    <div class="tp-row"><span class="tp-lbl">コントラスト</span><input type="range" class="rslider adj" id="adjCon" min="50" max="150" value="100"><output class="tp-val" for="adjCon">100</output></div>
+    <div class="tp-row"><span class="tp-lbl">彩度</span><input type="range" class="rslider adj" id="adjSat" min="0" max="200" value="100"><output class="tp-val" for="adjSat">100</output></div>
+    <div class="tp-row end"><button class="tbtn" id="btnAdjReset">色調整をリセット</button></div>
+  </details>
+
+  <div class="tp-row">
+    <span class="tp-lbl">再生時間</span>
+    <input type="text" id="durInput" value="12:08" maxlength="9" spellcheck="false" aria-label="Duration">
+    <span class="tp-note">ドラッグ: 位置 / ホイール: カーソル位置にズーム / 矢印キー: 微調整</span>
   </div>
 </aside>
 
@@ -238,10 +315,11 @@
             <!-- first item: user's thumbnail -->
             <div class="yt-rec user">
               <div class="yt-thumb">
-                <div class="yt-thumb-box" id="thumbBox">
-                  <img id="thumbImg" alt="" draggable="false">
+                <div class="yt-thumb-box tc" id="thumbBox">
+                  <img class="tc-img" alt="" draggable="false">
+                  <div class="tc-text"></div>
                 </div>
-                <span class="yt-dur">12:08</span>
+                <span class="yt-dur" id="thumbDur">12:08</span>
               </div>
               <div class="yt-rec-info">
                 <div class="yt-rec-title" id="recTitle">Sample Title</div>

@@ -168,15 +168,19 @@ html[data-theme="light"] .ic-moon { display: none; }
   #arSlider { width: 110px; }
 }
 
-/* ================= thumbnail adjustment panel ================= */
+/* ================= thumbnail editor panel ================= */
 /* anchored on the left so it never covers the sidebar thumbnail
-   it is adjusting */
+   it is editing */
 .thumb-panel {
   position: fixed;
   top: calc(var(--bar-h) + 10px);
   left: 18px;
   z-index: 50;
+  width: 442px;
   max-width: calc(100vw - 24px);
+  max-height: calc(100vh - var(--bar-h) - 20px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--c-panel);
   border: 1px solid var(--c-line);
   border-radius: 12px;
@@ -185,23 +189,133 @@ html[data-theme="light"] .ic-moon { display: none; }
   display: flex;
   flex-direction: column;
   gap: 10px;
+  font-size: 12px;
 }
 .thumb-panel[hidden] { display: none; }
-.tp-preview {
+.thumb-panel > * { flex: none; }
+body[data-drop="thumb"] .thumb-panel { outline: 2px dashed var(--acc); outline-offset: -2px; }
+
+.tp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tp-title { font-size: 14px; font-weight: bold; }
+.tp-head-btns { display: flex; align-items: center; gap: 4px; }
+
+/* small text buttons */
+.tbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--c-line);
+  border-radius: 7px;
+  background: none;
+  color: var(--c-fg);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tbtn:hover:not(:disabled) { background: var(--c-hover); }
+.tbtn:disabled { opacity: .4; cursor: default; }
+.tbtn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tbtn.accent { background: var(--acc); border-color: var(--acc); color: #fff; }
+.tbtn.accent:hover { filter: brightness(1.1); background: var(--acc); }
+.ibtn.sm { width: 30px; height: 30px; flex: none; }
+.ibtn.sm svg { width: 18px; height: 18px; }
+
+/* ----- thumbnail composition (shared by every view) ----- */
+.tc {
   position: relative;
-  width: min(416px, 78vw);
-  aspect-ratio: 16 / 9;
-  border-radius: 8px;
   overflow: hidden;
   background: #000;
 }
-.tp-preview img {
+.tc-img {
   position: absolute;
   display: none;
+  max-width: none;
+  transform-origin: 50% 50%;
 }
-body.has-img .tp-preview img { display: block; }
-body.has-img .tp-preview { cursor: grab; }
-body.has-img .tp-preview.panning { cursor: grabbing; }
+.tc-text {
+  position: absolute;
+  display: none;
+  transform: translate(-50%, -50%);
+  white-space: pre;
+  text-align: center;
+  line-height: 1.12;
+  letter-spacing: .01em;
+  paint-order: stroke fill;
+  -webkit-text-stroke-linejoin: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+  user-select: none;
+}
+.tc-export {
+  position: fixed;
+  left: -99999px;
+  top: 0;
+  width: 1280px;
+  height: 720px;
+  pointer-events: none;
+}
+
+/* large preview */
+.tp-preview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  outline: none;
+  touch-action: none;
+}
+.tp-preview:focus-visible { box-shadow: 0 0 0 2px var(--acc); }
+body.has-thumb .tp-preview { cursor: grab; }
+body.has-thumb .tp-preview.panning { cursor: grabbing; }
+.tp-preview .tc-text { pointer-events: auto; cursor: move; }
+.tp-preview .tc-text:hover { outline: 1px dashed rgba(255,255,255,.7); outline-offset: 4px; }
+.tp-preview.moving-text .tc-text { outline: 1px dashed var(--acc); outline-offset: 4px; }
+/* the badge in the preview is shown at the size it has relative to
+   the sidebar thumbnail (168px wide), i.e. the worst case */
+.tp-preview { container-type: inline-size; }
+.tp-preview .tp-dur {
+  right: 2.4cqw;
+  bottom: 2.4cqw;
+  font-size: 7.1cqw;
+  padding: 1.2cqw 2.4cqw;
+  border-radius: 2.4cqw;
+  pointer-events: none;
+}
+.tp-grid, .tp-snap {
+  position: absolute;
+  pointer-events: none;
+  display: none;
+}
+.tp-grid {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent calc(33.333% - .5px), rgba(255,255,255,.55) calc(33.333% - .5px), rgba(255,255,255,.55) calc(33.333% + .5px), transparent calc(33.333% + .5px),
+      transparent calc(66.666% - .5px), rgba(255,255,255,.55) calc(66.666% - .5px), rgba(255,255,255,.55) calc(66.666% + .5px), transparent calc(66.666% + .5px)),
+    linear-gradient(180deg, transparent calc(33.333% - .5px), rgba(255,255,255,.55) calc(33.333% - .5px), rgba(255,255,255,.55) calc(33.333% + .5px), transparent calc(33.333% + .5px),
+      transparent calc(66.666% - .5px), rgba(255,255,255,.55) calc(66.666% - .5px), rgba(255,255,255,.55) calc(66.666% + .5px), transparent calc(66.666% + .5px));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+}
+.tp-preview.grid .tp-grid { display: block; }
+.tp-snap { background: var(--acc); }
+.tp-snap.v { top: 0; bottom: 0; left: calc(50% - .5px); width: 1px; }
+.tp-snap.h { left: 0; right: 0; top: calc(50% - .5px); height: 1px; }
+.tp-preview.snap-v .tp-snap.v,
+.tp-preview.snap-h .tp-snap.h { display: block; }
 .tp-ph {
   position: absolute;
   inset: 0;
@@ -209,8 +323,9 @@ body.has-img .tp-preview.panning { cursor: grabbing; }
   align-items: center;
   justify-content: center;
   color: #5a5a5a;
+  cursor: pointer;
 }
-body.has-img .tp-ph { display: none; }
+body.has-thumb .tp-ph { display: none; }
 .tp-ph svg {
   width: 56px;
   height: 56px;
@@ -220,12 +335,27 @@ body.has-img .tp-ph { display: none; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+/* real-size previews */
+.tp-sizes {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 2px 0;
+}
+.tp-sizes figure { margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.tp-sizes figcaption { color: var(--c-fg2); font-size: 11px; }
+.tp-mini { border-radius: 6px; flex: none; }
+.tp-mini .yt-dur { font-family: Roboto, Arial, sans-serif; }
+
 .tp-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
-.tp-row .rslider { flex: 1; width: auto; }
+.tp-row.end { justify-content: flex-end; }
+.tp-sec .tp-row { min-height: 28px; }
+.tp-row .rslider { flex: 1; width: auto; min-width: 60px; }
 .tp-ic {
   width: 20px;
   height: 20px;
@@ -237,6 +367,104 @@ body.has-img .tp-ph { display: none; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.tp-lbl { width: 72px; flex: none; color: var(--c-fg2); }
+.tp-val {
+  width: 30px;
+  text-align: right;
+  color: var(--c-fg2);
+  font-variant-numeric: tabular-nums;
+}
+.tp-note { color: var(--c-fg2); font-size: 11px; line-height: 1.4; }
+#zoomLabel { min-width: 48px; }
+
+.tp-sec {
+  border-top: 1px solid var(--c-line);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tp-sec[open] { gap: 8px; }
+.tp-sec > summary {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.tp-sec > summary::-webkit-details-marker { display: none; }
+.tp-sec > summary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform .15s;
+  margin: 0 3px;
+}
+.tp-sec[open] > summary::before { transform: rotate(45deg); }
+.tp-sec[open] > summary { margin-bottom: 2px; }
+
+.thumb-panel textarea,
+.thumb-panel select,
+.thumb-panel input[type="text"] {
+  font: inherit;
+  font-size: 13px;
+  color: var(--c-fg);
+  background: var(--c-bg);
+  border: 1px solid var(--c-line);
+  border-radius: 7px;
+  padding: 6px 8px;
+  outline: none;
+}
+.thumb-panel textarea { resize: vertical; min-height: 44px; width: 100%; }
+.thumb-panel select { height: 30px; padding: 0 6px; flex: 1; }
+.thumb-panel input[type="text"] { width: 80px; height: 28px; font-variant-numeric: tabular-nums; }
+.thumb-panel textarea:focus,
+.thumb-panel select:focus,
+.thumb-panel input[type="text"]:focus { border-color: var(--acc); }
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 7px;
+  border: 1px solid var(--c-line);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+.swatch input {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+}
+.chk { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.chk input { accent-color: var(--acc); margin: 0; }
+
+.seg { display: flex; border: 1px solid var(--c-line); border-radius: 7px; overflow: hidden; flex: none; }
+.seg button {
+  height: 28px;
+  min-width: 30px;
+  padding: 0 6px;
+  border: none;
+  background: none;
+  color: var(--c-fg);
+  font: inherit;
+  cursor: pointer;
+}
+.seg button + button { border-left: 1px solid var(--c-line); }
+.seg button:hover { background: var(--c-hover); }
+.seg button.active { background: color-mix(in srgb, var(--acc) 18%, transparent); color: var(--acc); }
 
 /* ================= stage scaling ================= */
 .stage-outer {
@@ -459,9 +687,9 @@ body.has-img .tp-ph { display: none; }
 .stage.has-img .yt-video-box img { display: block; }
 /* drag to pan the visible area of the image */
 .stage.has-img .yt-video-box,
-.stage.has-img .yt-thumb-box { cursor: grab; }
+body.has-thumb .yt-thumb-box { cursor: grab; }
 .stage.has-img .yt-video-box.panning,
-.stage.has-img .yt-thumb-box.panning { cursor: grabbing; }
+body.has-thumb .yt-thumb-box.panning { cursor: grabbing; }
 .yt-placeholder {
   display: flex;
   flex-direction: column;
@@ -724,19 +952,13 @@ body.has-img .tp-ph { display: none; }
 }
 .yt-thumb.solid { background: none; }
 /* the recommended thumbnail is always 16:9 (like a real uploaded
-   thumbnail) and is adjusted independently of the player aspect;
-   its image is sized/positioned by JS to support zoom + pan */
+   thumbnail) and is edited independently of the player aspect;
+   it is a ".tc" composition rendered by JS (zoom, pan, text...) */
 .yt-thumb-box {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  background: #000;
 }
-.yt-thumb-box img {
-  position: absolute;
-  display: none;
-}
-.stage.has-img .yt-thumb-box img { display: block; }
+body[data-drop="thumb"] .yt-thumb { outline: 2px dashed var(--acc); outline-offset: 2px; }
 .yt-thumb-fill {
   position: absolute;
   inset: 0;
